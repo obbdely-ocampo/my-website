@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Obbdely's Taco Shop 🌮</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: #fff5d6;
+      min-height: 100vh;
+    }
+
+    /* NAV */
+    .site-nav {
+      background: #bf2c34;
+      display: flex;
+      border-bottom: 4px solid #8a1c22;
+    }
+    .site-nav a {
+      color: #fff;
+      text-decoration: none;
+      padding: 14px 28px;
+      font-weight: 800;
+      font-size: 1rem;
+      transition: background 0.15s;
+      display: block;
+    }
+    .site-nav a:hover { background: #8a1c22; }
+    .site-nav a.active { background: #8a1c22; }
+
+    /* HEADER */
+    .header {
+      background: linear-gradient(135deg, #bf2c34, #f07d00);
+      text-align: center;
+      padding: 20px 12px 14px;
+    }
+    .header h1 {
+      font-family: 'Fredoka One', cursive;
+      font-size: 2.8rem;
+      color: #fff;
+      text-shadow: 3px 3px 0 #8a1c22;
+    }
+    .header p { color: #ffe8b0; font-weight: 700; margin-top: 4px; }
+
+    /* SCOREBAR */
+    .scorebar {
+      background: #8a1c22;
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      padding: 8px 20px;
+      color: #fff;
+      font-weight: 800;
+      font-size: 1rem;
+    }
+    .scorebar .val {
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.4rem;
+      color: #f5c400;
+    }
+
+    /* GAME LAYOUT */
+    .game {
+      display: flex;
+      gap: 16px;
+      max-width: 1000px;
+      margin: 18px auto;
+      padding: 0 14px 40px;
+      align-items: flex-start;
+    }
+
+    /* PANELS */
+    .panel {
+      background: #fff9ec;
+      border: 3px solid #f07d00;
+      border-radius: 16px;
+      box-shadow: 4px 4px 0 #c87a00;
+      padding: 14px 12px;
+    }
+    .panel-title {
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.1rem;
+      color: #bf2c34;
+      text-align: center;
+      border-bottom: 2px dashed #f07d00;
+      padding-bottom: 8px;
+      margin-bottom: 10px;
+    }
+
+    /* LEFT COLUMN */
+    .col-left { width: 210px; flex-shrink: 0; display: flex; flex-direction: column; gap: 14px; }
+
+    .avatar { font-size: 3.5rem; text-align: center; display: block; animation: bob 1.6s ease-in-out infinite; }
+    @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
+
+    .bubble {
+      background: #fff;
+      border: 2px solid #f07d00;
+      border-radius: 12px;
+      padding: 8px 10px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #5a3010;
+      margin-top: 8px;
+      text-align: center;
+      position: relative;
+    }
+    .bubble::before {
+      content: '';
+      position: absolute;
+      top: -10px; left: 50%; transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-bottom-color: #f07d00;
+    }
+
+    .ticket-name { font-family: 'Fredoka One', cursive; font-size: 1.1rem; color: #bf2c34; margin-bottom: 6px; }
+    #ticketItems { list-style: none; }
+    #ticketItems li {
+      padding: 3px 0;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #4a2e0a;
+      border-bottom: 1px dashed #e0c88a;
+    }
+    #ticketItems li.checked { text-decoration: line-through; color: #b0a080; }
+
+    .timer-track {
+      height: 18px;
+      background: #f0d8a0;
+      border-radius: 9px;
+      border: 2px solid #f07d00;
+      overflow: hidden;
+    }
+    #timerFill {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #3aaa5c, #f5c400, #f07d00, #bf2c34);
+      background-size: 400% 100%;
+      border-radius: 9px;
+      transition: width 0.4s linear;
+    }
+
+    /* MIDDLE COLUMN */
+    .col-mid { flex: 1; display: flex; flex-direction: column; gap: 14px; align-items: center; }
+
+    .taco-box {
+      background: #fff9ec;
+      border: 3px solid #f07d00;
+      border-radius: 16px;
+      box-shadow: 4px 4px 0 #c87a00;
+      width: 100%;
+      min-height: 210px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 52px 14px 14px;
+      position: relative;
+      overflow: hidden;
+    }
+    .taco-box-top {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      background: linear-gradient(90deg, #f5c400, #f07d00);
+      text-align: center;
+      font-family: 'Fredoka One', cursive;
+      font-size: 1rem;
+      color: #fff;
+      padding: 8px;
+      border-radius: 13px 13px 0 0;
+    }
+    #tacoShellDisplay { font-size: 5.5rem; line-height: 1; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.15)); }
+    #toppingChips {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 5px;
+      margin-top: 8px;
+      min-height: 28px;
+    }
+    .chip {
+      background: #fff;
+      border: 2px solid #f07d00;
+      border-radius: 20px;
+      padding: 2px 10px;
+      font-size: 0.74rem;
+      font-weight: 800;
+      color: #5a3010;
+      animation: pop 0.18s ease-out;
+    }
+    @keyframes pop { from{transform:scale(0.3);opacity:0} to{transform:scale(1);opacity:1} }
+
+    .shell-picker { display: flex; gap: 10px; justify-content: center; }
+    .shell-btn {
+      background: #fdf3d0;
+      border: 2px solid #f07d00;
+      border-radius: 12px;
+      padding: 8px 14px;
+      font-weight: 800;
+      font-size: 0.82rem;
+      color: #4a2e0a;
+      cursor: pointer;
+      box-shadow: 2px 2px 0 #c87a00;
+      transition: background 0.12s, transform 0.1s;
+    }
+    .shell-btn:hover { background: #ffe4a0; transform: translateY(-2px); }
+    .shell-btn.sel { background: #ffe080; border-color: #f5c400; box-shadow: 2px 2px 0 #c8a000; }
+
+    .actions { display: flex; gap: 12px; }
+    .btn-serve {
+      background: #3aaa5c;
+      color: #fff;
+      border: 3px solid #1e7a3c;
+      border-radius: 12px;
+      padding: 11px 28px;
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.15rem;
+      cursor: pointer;
+      box-shadow: 3px 3px 0 #1e7a3c;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .btn-serve:hover { transform: translateY(-2px); box-shadow: 3px 5px 0 #1e7a3c; }
+    .btn-serve:active { transform: translateY(1px); box-shadow: 1px 1px 0 #1e7a3c; }
+    .btn-clear {
+      background: #ddd;
+      color: #555;
+      border: 3px solid #aaa;
+      border-radius: 12px;
+      padding: 11px 20px;
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.15rem;
+      cursor: pointer;
+      box-shadow: 3px 3px 0 #aaa;
+      transition: transform 0.1s;
+    }
+    .btn-clear:hover { background: #ccc; transform: translateY(-2px); }
+    .btn-clear:active { transform: translateY(1px); }
+
+    /* RIGHT COLUMN */
+    .col-right { width: 200px; flex-shrink: 0; display: flex; flex-direction: column; gap: 14px; }
+
+    .ing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .ing-btn {
+      background: #fdf3d0;
+      border: 2px solid #f07d00;
+      border-radius: 10px;
+      padding: 7px 4px;
+      cursor: pointer;
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #4a2e0a;
+      text-align: center;
+      box-shadow: 2px 2px 0 #c87a00;
+      transition: background 0.12s, transform 0.1s;
+      user-select: none;
+      line-height: 1.3;
+    }
+    .ing-btn .em { font-size: 1.4rem; display: block; }
+    .ing-btn:hover { background: #ffe4a0; transform: translateY(-2px); }
+    .ing-btn:active { transform: translateY(1px); }
+    .ing-btn.on { background: #d4f7d4; border-color: #3aaa5c; box-shadow: 2px 2px 0 #1e7a3c; }
+
+    #historyList { list-style: none; }
+    #historyList li { font-size: 0.78rem; font-weight: 700; color: #5a3010; border-bottom: 1px dashed #e0c88a; padding: 4px 0; }
+    #historyList li .st { color: #f5c400; }
+
+    /* TOAST */
+    #toast {
+      position: fixed;
+      top: 80px; left: 50%; transform: translateX(-50%) translateY(-30px);
+      background: #3aaa5c;
+      color: #fff;
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.4rem;
+      padding: 14px 36px;
+      border-radius: 16px;
+      border: 3px solid #1e7a3c;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.25);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.28s, transform 0.28s;
+      z-index: 999;
+      text-align: center;
+      max-width: 90vw;
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    #toast.bad  { background: #bf2c34; border-color: #8a1c22; }
+
+    /* GAME OVER */
+    #gameOver {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    #gameOver.show { display: flex; }
+    .go-box {
+      background: #fff9ec;
+      border: 4px solid #f07d00;
+      border-radius: 24px;
+      padding: 40px 52px;
+      text-align: center;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.35);
+    }
+    .go-box h2 { font-family: 'Fredoka One', cursive; font-size: 2.5rem; color: #bf2c34; }
+    .go-box p  { color: #5a3010; font-size: 1rem; font-weight: 700; margin: 8px 0; }
+    .btn-restart {
+      margin-top: 16px;
+      background: #bf2c34;
+      color: #fff;
+      border: 3px solid #8a1c22;
+      border-radius: 12px;
+      padding: 12px 36px;
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.3rem;
+      cursor: pointer;
+      box-shadow: 4px 4px 0 #8a1c22;
+    }
+    .btn-restart:hover { background: #8a1c22; }
+
+    @media (max-width: 680px) {
+      .game { flex-direction: column; }
+      .col-left, .col-right { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="site-nav">
+  <a href="index.html">🏠 Home</a>
+  <a href="taco-game.html" class="active">🌮 Taco Game</a>
+</nav>
+
+<!-- HEADER -->
+<div class="header">
+  <h1>🌮 Obbdely's Taco Shop 🌮</h1>
+  <p>Build the exact taco the customer ordered before time runs out!</p>
+</div>
+
+<!-- SCOREBAR -->
+<div class="scorebar">
+  💰 Tips: <span class="val" id="score">0</span>
+  &nbsp;
+  📋 Order #<span class="val" id="orderNum">1</span>
+  &nbsp;
+  ❤️ Lives: <span class="val" id="livesDisplay">❤️❤️❤️</span>
+</div>
+
+<!-- GAME -->
+<div class="game">
+
+  <!-- LEFT -->
+  <div class="col-left">
+    <div class="panel">
+      <div class="panel-title">🧑 Customer</div>
+      <span class="avatar" id="avatar">👩</span>
+      <div class="bubble" id="speech">Make me a taco!</div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">📋 Order Ticket</div>
+      <div class="ticket-name" id="custName">Rosa</div>
+      <ul id="ticketItems"></ul>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">⏰ Time Left</div>
+      <div class="timer-track"><div id="timerFill"></div></div>
+    </div>
+  </div>
+
+  <!-- MIDDLE -->
+  <div class="col-mid">
+    <div class="taco-box">
+      <div class="taco-box-top">🍳 BUILD STATION</div>
+      <div id="tacoShellDisplay">🌮</div>
+      <div id="toppingChips"></div>
+    </div>
+
+    <div>
+      <div style="text-align:center;font-family:'Fredoka One',cursive;color:#bf2c34;margin-bottom:8px;">Pick Your Shell</div>
+      <div class="shell-picker">
+        <button class="shell-btn sel" id="shell-corn"   onclick="pickShell('corn',  '🌮', this)">🌮 Corn</button>
+        <button class="shell-btn"     id="shell-flour"  onclick="pickShell('flour', '🫓', this)">🫓 Flour</button>
+        <button class="shell-btn"     id="shell-crispy" onclick="pickShell('crispy','🥙', this)">🥙 Crispy</button>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn-serve" onclick="serve()">✅ Serve!</button>
+      <button class="btn-clear" onclick="clearBuild()">🗑️ Clear</button>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="col-right">
+    <div class="panel">
+      <div class="panel-title">🧂 Ingredients</div>
+      <div class="ing-grid" id="ingGrid"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">📜 History</div>
+      <ul id="historyList"><li style="color:#bbb">No orders yet</li></ul>
+    </div>
+  </div>
+
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- GAME OVER -->
+<div id="gameOver">
+  <div class="go-box">
+    <div style="font-size:3.5rem">🌮</div>
+    <h2>Shop Closed!</h2>
+    <p id="goMsg">You ran out of lives!</p>
+    <p>Final Tips: <strong id="goScore">0</strong> coins</p>
+    <p>Orders Served: <strong id="goOrders">0</strong></p>
+    <button class="btn-restart" onclick="restartGame()">🔄 Play Again</button>
+  </div>
+</div>
+
+<script>
+var INGS = [
+  {id:'beef',      label:'Beef',       emoji:'🥩'},
+  {id:'chicken',   label:'Chicken',    emoji:'🍗'},
+  {id:'beans',     label:'Beans',      emoji:'🫘'},
+  {id:'cheese',    label:'Cheese',     emoji:'🧀'},
+  {id:'lettuce',   label:'Lettuce',    emoji:'🥬'},
+  {id:'tomato',    label:'Tomato',     emoji:'🍅'},
+  {id:'salsa',     label:'Salsa',      emoji:'🫙'},
+  {id:'sour_cream',label:'Sour Cream', emoji:'🥛'},
+  {id:'guac',      label:'Guacamole',  emoji:'🥑'},
+  {id:'jalapeno',  label:'Jalapeños',  emoji:'🌶️'},
+  {id:'onion',     label:'Onion',      emoji:'🧅'},
+  {id:'cilantro',  label:'Cilantro',   emoji:'🌿'},
+  {id:'lime',      label:'Lime',       emoji:'🍋'},
+  {id:'hot_sauce', label:'Hot Sauce',  emoji:'🔥'}
+];
+
+var SHELL_NAMES = {corn:'Corn Tortilla', flour:'Flour Tortilla', crispy:'Crispy Shell'};
+
+var CUSTOMERS = [
+  {name:'Rosa',   avatar:'👩',   speech:'One taco por favor!'},
+  {name:'Miguel', avatar:'🧑',   speech:'Make it extra spicy!'},
+  {name:'Sofia',  avatar:'👧',   speech:'No jalapeños please!'},
+  {name:'Carlos', avatar:'👨',   speech:'Extra guac for me!'},
+  {name:'Abuela', avatar:'👵',   speech:'Make it taste like home!'},
+  {name:'Tyler',  avatar:'🧔',   speech:'First time here, help!'},
+  {name:'Priya',  avatar:'👩',   speech:'Surprise me with something good!'},
+  {name:'DJ',     avatar:'👱',   speech:'Load it ALL the way up!'}
+];
+
+// State
+var score = 0;
+var lives = 3;
+var orderCount = 0;
+var currentOrder = null;
+var chosenShell = 'corn';
+var addedIngs = [];
+var timerPct = 100;
+var timerInterval = null;
+var busy = false;
+var historyFilled = false;
+var toastTimer = null;
+
+// Boot
+function boot() {
+  buildIngGrid();
+  nextOrder();
+}
+
+function buildIngGrid() {
+  var grid = document.getElementById('ingGrid');
+  grid.innerHTML = '';
+  for (var i = 0; i < INGS.length; i++) {
+    var ing = INGS[i];
+    var btn = document.createElement('button');
+    btn.className = 'ing-btn';
+    btn.id = 'ib_' + ing.id;
+    btn.innerHTML = '<span class="em">' + ing.emoji + '</span>' + ing.label;
+    btn.setAttribute('data-id', ing.id);
+    btn.onclick = makeIngClickHandler(ing.id);
+    grid.appendChild(btn);
+  }
+}
+
+function makeIngClickHandler(id) {
+  return function() { addIng(id); };
+}
+
+function nextOrder() {
+  busy = false;
+  clearBuild();
+
+  var cust = CUSTOMERS[Math.floor(Math.random() * CUSTOMERS.length)];
+  var shellKeys = ['corn','flour','crispy'];
+  var shell = shellKeys[Math.floor(Math.random() * 3)];
+
+  var shuffled = INGS.slice().sort(function(){ return Math.random() - 0.5; });
+  var n = 2 + Math.floor(Math.random() * 4);
+  var items = shuffled.slice(0, n);
+
+  currentOrder = {cust: cust, shell: shell, items: items};
+  orderCount++;
+
+  document.getElementById('avatar').textContent = cust.avatar;
+  document.getElementById('speech').textContent = cust.speech;
+  document.getElementById('custName').textContent = cust.name;
+  document.getElementById('orderNum').textContent = orderCount;
+
+  var list = document.getElementById('ticketItems');
+  list.innerHTML = '';
+
+  var shellLi = document.createElement('li');
+  shellLi.id = 'tick_shell';
+  shellLi.textContent = '\uD83E\uDEB4 ' + SHELL_NAMES[shell];
+  list.appendChild(shellLi);
+
+  for (var i = 0; i < items.length; i++) {
+    var li = document.createElement('li');
+    li.id = 'tick_' + items[i].id;
+    li.textContent = items[i].emoji + ' ' + items[i].label;
+    list.appendChild(li);
+  }
+
+  startTimer();
+}
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timerPct = 100;
+  updateTimerBar();
+  timerInterval = setInterval(function() {
+    timerPct -= 1.4;
+    if (timerPct < 0) timerPct = 0;
+    updateTimerBar();
+    if (timerPct <= 0) {
+      clearInterval(timerInterval);
+      if (!busy) {
+        busy = true;
+        loseLife();
+        showToast('⏰ Too slow! Life lost!', true);
+        addHistory(currentOrder.cust.name, 0);
+        if (lives > 0) setTimeout(nextOrder, 1600);
+      }
+    }
+  }, 400);
+}
+
+function updateTimerBar() {
+  document.getElementById('timerFill').style.width = timerPct + '%';
+}
+
+function pickShell(id, emoji, btn) {
+  chosenShell = id;
+  var btns = document.querySelectorAll('.shell-btn');
+  for (var i = 0; i < btns.length; i++) btns[i].classList.remove('sel');
+  btn.classList.add('sel');
+  document.getElementById('tacoShellDisplay').textContent = emoji;
+  refreshTicket();
+}
+
+function addIng(id) {
+  if (addedIngs.indexOf(id) !== -1) return;
+  addedIngs.push(id);
+
+  var ing = null;
+  for (var i = 0; i < INGS.length; i++) {
+    if (INGS[i].id === id) { ing = INGS[i]; break; }
+  }
+  if (!ing) return;
+
+  var chip = document.createElement('div');
+  chip.className = 'chip';
+  chip.textContent = ing.emoji + ' ' + ing.label;
+  document.getElementById('toppingChips').appendChild(chip);
+
+  var btn = document.getElementById('ib_' + id);
+  if (btn) btn.classList.add('on');
+
+  refreshTicket();
+}
+
+function clearBuild() {
+  addedIngs = [];
+  chosenShell = 'corn';
+  document.getElementById('toppingChips').innerHTML = '';
+  document.getElementById('tacoShellDisplay').textContent = '🌮';
+
+  var shellBtns = document.querySelectorAll('.shell-btn');
+  for (var i = 0; i < shellBtns.length; i++) shellBtns[i].classList.remove('sel');
+  var corn = document.getElementById('shell-corn');
+  if (corn) corn.classList.add('sel');
+
+  var ingBtns = document.querySelectorAll('.ing-btn');
+  for (var j = 0; j < ingBtns.length; j++) ingBtns[j].classList.remove('on');
+}
+
+function refreshTicket() {
+  if (!currentOrder) return;
+  var shellLi = document.getElementById('tick_shell');
+  if (shellLi) shellLi.classList.toggle('checked', chosenShell === currentOrder.shell);
+
+  for (var i = 0; i < currentOrder.items.length; i++) {
+    var li = document.getElementById('tick_' + currentOrder.items[i].id);
+    if (li) li.classList.toggle('checked', addedIngs.indexOf(currentOrder.items[i].id) !== -1);
+  }
+}
+
+function serve() {
+  if (!currentOrder || busy) return;
+  busy = true;
+  clearInterval(timerInterval);
+
+  var mistakes = 0;
+  if (chosenShell !== currentOrder.shell) mistakes++;
+
+  for (var i = 0; i < currentOrder.items.length; i++) {
+    if (addedIngs.indexOf(currentOrder.items[i].id) === -1) mistakes++;
+  }
+
+  for (var j = 0; j < addedIngs.length; j++) {
+    var found = false;
+    for (var k = 0; k < currentOrder.items.length; k++) {
+      if (currentOrder.items[k].id === addedIngs[j]) { found = true; break; }
+    }
+    if (!found) mistakes++;
+  }
+
+  var stars, tip, msg;
+  if (mistakes === 0) {
+    stars = 5; tip = 30; msg = '🌟 Perfect! +30 tips!';
+  } else if (mistakes === 1) {
+    stars = 4; tip = 20; msg = '😊 Almost perfect! +20 tips!';
+  } else if (mistakes === 2) {
+    stars = 3; tip = 10; msg = '😐 Pretty good! +10 tips!';
+  } else if (mistakes === 3) {
+    stars = 2; tip = 5;  msg = '😕 Needs work… +5 tips.';
+  } else {
+    stars = 1; tip = 0;  msg = '😬 Wrong order! No tip.';
+    loseLife();
+  }
+
+  score += tip;
+  document.getElementById('score').textContent = score;
+  showToast(msg, stars <= 1);
+  addHistory(currentOrder.cust.name, stars);
+  if (lives > 0) setTimeout(nextOrder, 1600);
+}
+
+function loseLife() {
+  lives--;
+  var h = '';
+  for (var i = 0; i < lives; i++) h += '❤️';
+  document.getElementById('livesDisplay').textContent = lives > 0 ? h : '💔';
+  if (lives <= 0) setTimeout(gameOver, 700);
+}
+
+function addHistory(name, stars) {
+  var list = document.getElementById('historyList');
+  if (!historyFilled) { list.innerHTML = ''; historyFilled = true; }
+
+  var li = document.createElement('li');
+  var s = '';
+  for (var i = 0; i < stars; i++) s += '⭐';
+  for (var j = stars; j < 5; j++) s += '☆';
+  li.innerHTML = name + ' <span class="st">' + s + '</span>';
+  list.insertBefore(li, list.firstChild);
+  while (list.children.length > 7) list.removeChild(list.lastChild);
+}
+
+function showToast(msg, bad) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = bad ? 'show bad' : 'show';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ el.className = ''; }, 2100);
+}
+
+function gameOver() {
+  clearInterval(timerInterval);
+  document.getElementById('goScore').textContent  = score;
+  document.getElementById('goOrders').textContent = orderCount;
+  var msg = score >= 150 ? '🎉 Legendary taquero/a!' :
+            score >= 80  ? '👍 Pretty solid work!'   :
+            score >= 40  ? '😊 Getting the hang of it!' : 'Keep practicing!';
+  document.getElementById('goMsg').textContent = msg;
+  document.getElementById('gameOver').classList.add('show');
+}
+
+function restartGame() {
+  score = 0; lives = 3; orderCount = 0; historyFilled = false;
+  document.getElementById('score').textContent = 0;
+  document.getElementById('livesDisplay').textContent = '❤️❤️❤️';
+  document.getElementById('orderNum').textContent = 1;
+  document.getElementById('historyList').innerHTML = '<li style="color:#bbb">No orders yet</li>';
+  document.getElementById('gameOver').classList.remove('show');
+  nextOrder();
+}
+
+window.onload = boot;
+</script>
+</body>
+</html>
